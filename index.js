@@ -47,26 +47,29 @@ const sessionStore = new MongoDBSession({
 let userCollection;
 let sessionCollection;
 
-// Debugged by ChatGPT-4. Cyclic specifies that connections to MongoDB databases must be established before 
-// listening for server requests. 
-//
+
 // Below, both connections are established before the server starts listening for requests by using the Promise.
-// all() method to wait for both connections to be established before starting the server. LocalHost had no 
-// issues not using a promise, but hosting services like Cyclic would crash the app each time a collection was 
-// accessed (e.g., check if a user exists) without the promise. 
+// all() method to wait for both connections to be established before starting the server. 
+//
+// LocalHost had no issues not using a promise, but hosting services like Cyclic would crash the app each time a 
+// collection was accessed (e.g., check if a user exists) without the promise. 
+//
+// @credit Debugged by ChatGPT-4 (NOTE: Cyclic specifies that connections to MongoDB databases must be established
+//         before listening for server requests) 
 Promise.all([
     new Promise(resolve => mongodbStore.on('connected', resolve)),
     new Promise(resolve => sessionStore.on('connected', resolve))
-  ]).then(() => {
+]).then(() => {
     console.log('MongoDB user store and session store connected');
     userCollection = mongodbStore.client.db().collection('users');
     sessionCollection = sessionStore.client.db().collection('sessions');
     app.listen(port, () => {
-      console.log("Node application listening on port " + port);
+        console.log("Node application listening on port " + port);
     });
-  });
-  
+});
 
+
+// Setup session support to enable storing session data.
 app.use(session({
     secret: node_session_secret,
     store: sessionStore,
@@ -74,6 +77,7 @@ app.use(session({
     resave: true
 }
 ));
+
 
 // Homepage is a login/signup page if not logged in but is members page if logged in
 app.get('/', (req, res) => {
@@ -95,7 +99,7 @@ app.get('/', (req, res) => {
 });
 
 
-// @author greencodecomments
+// @credit greencodecomments
 // @see https://github.com/greencodecomments/COMP2537_Demo_Code_1/blob/main/index.js
 app.get('/signup', (req, res) => {
     var html = `
@@ -110,7 +114,8 @@ app.get('/signup', (req, res) => {
     res.send(html);
 });
 
-// @author greencodecomments
+
+// @credit greencodecomments
 // @see https://github.com/greencodecomments/COMP2537_Demo_Code_1/blob/main/index.js
 app.get('/login', (req, res) => {
     var html = `
@@ -125,9 +130,16 @@ app.get('/login', (req, res) => {
 });
 
 
+// The express.urlencoded middleware is used to parse incoming request bodies that are in URL-encoded format. 
+// This middleware extracts the form data (i.e., name, email, password) from the request body and makes it 
+// available in req.body to extract and use to create a new user in the database.
+// 
+// @credit greencodecomments
+// @see https://stackoverflow.com/questions/24330014/bodyparser-is-deprecated-express-4
 app.use(express.urlencoded({ extended: true }));
 
-// @author greencodecomments
+
+// @credit greencodecomments
 // @see https://github.com/greencodecomments/COMP2537_Demo_Code_1/blob/main/index.js
 app.post('/signupSubmit', async (req, res) => {
     var name = req.body.name;
@@ -206,6 +218,8 @@ app.post('/signupSubmit', async (req, res) => {
 
     // Parametrized query treats user input as plain data and not code, so as to defend against injection attacks.
     // $eq looks for an exact match and requires collation for case-insensitive query. Name must be unique.
+    //
+    //@credit Debugged by ChatGPT-4
     const nameResult = await userCollection.find({ name: { $eq: name } }, { collation: { locale: 'en_US', strength: 2 } }).project({ name: 1, email: 1, password: 1, _id: 1 }).toArray();
 
     const emailResult = await userCollection.find({ email: { $eq: email } }).project({ name: 1, email: 1, password: 1, _id: 1 }).toArray();
@@ -391,7 +405,7 @@ app.get('/logout', (req, res) => {
     </html>
   `;
 
-  res.send(html);
+    res.send(html);
 });
 
 
@@ -434,8 +448,3 @@ app.get("*", (req, res) => {
     res.status(404);
     res.send("Error 404: Page not found!");
 });
-
-
-// app.listen(port, () => {
-//     console.log("Node application listening on port " + port);
-// });
