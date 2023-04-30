@@ -162,7 +162,7 @@ app.post('/signupSubmit', async (req, res) => {
                         `;
                     } else {
                         var html = `
-                        <p>Invalid email.</p>
+                        <p>Email must be 20 characters or less and not contain any illegal characters.</p>
                         <a href="/signup">Try again</a>
                         `;
                     }
@@ -175,7 +175,7 @@ app.post('/signupSubmit', async (req, res) => {
                         `;
                     } else {
                         var html = `
-                        <p>Invalid password.</p>
+                        <p>Password must be 20 characters or less and not contain any illegal characters.</p>
                         <a href="/signup">Try again</a>
                         `;
                     }
@@ -270,7 +270,46 @@ app.post('/loginSubmit', async (req, res) => {
 
     if (validationResult.error != null) {
         console.log(validationResult.error);
-        res.redirect("/login");
+
+        // Loop through the validation errors and check the context property
+        validationResult.error.details.forEach((error) => {
+
+            switch (error.context.key) {
+                case "email":
+                    if (email.trim() == "") {
+                        var html = `
+                        <p>Email required.</p>
+                        <a href="/login">Try again</a>
+                        `;
+                    } else {
+                        var html = `
+                        <p>Email must be 20 characters or less and not contain any illegal characters.</p>
+                        <a href="/login">Try again</a>
+                        `;
+                    }
+                    break;
+                case "password":
+                    if (password.trim() == "") {
+                        var html = `
+                        <p>Password required.</p>
+                        <a href="/login">Try again</a>
+                        `;
+                    } else {
+                        var html = `
+                        <p>Password must be 20 characters or less and not contain any illegal characters.</p>
+                        <a href="/login">Try again</a>
+                        `;
+                    }
+                    break;
+                default:
+                    // Error 400 for bad request if the validation error is other than 'name', 'email', and 'password'.
+                    var html = "Error 400: Invalid request!"
+                    res.status(400);
+            }
+
+            res.send(html);
+        })
+
         return;
     } else {
         // Search the collection for a matching user.
