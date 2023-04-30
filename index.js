@@ -47,13 +47,20 @@ const sessionStore = new MongoDBSession({
 let userCollection;
 let sessionCollection;
 
+mongodbStore.on('connected', function () {
+    console.log('MongoDB user store connected');
+
+    // Enable access to the users collection
+    userCollection = mongodbStore.client.db().collection('users');
+});
+
 sessionStore.on('connected', function () {
     console.log('MongoDB session store connected');
 
-    // Enable access to the LoginInfo collection
-    userCollection = mongodbStore.client.db().collection('users');
+    // Enable access to the sessions collection
     sessionCollection = sessionStore.client.db().collection('sessions');
 });
+
 
 app.use(session({
     secret: node_session_secret,
