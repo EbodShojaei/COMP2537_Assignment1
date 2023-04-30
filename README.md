@@ -30,6 +30,7 @@ A simple website using Node.js that connects to an encrypted MongoDB database to
 
 - Session information is stored in an encrypted MongoDB session database. Sessions expire after 1 hour.
 
+<br>
 
 ## Resources
 - **[COMP2537_Demo_Code_1](https://github.com/greencodecomments/COMP2537_Demo_Code_1)** by greencodecomments
