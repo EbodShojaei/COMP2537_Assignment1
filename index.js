@@ -47,6 +47,13 @@ const sessionStore = new MongoDBSession({
 let userCollection;
 let sessionCollection;
 
+// Debugged by ChatGPT-4. Cyclic specifies that connections to MongoDB databases must be established before 
+// listening for server requests. 
+//
+// Below, both connections are established before the server starts listening for requests by using the Promise.
+// all() method to wait for both connections to be established before starting the server. LocalHost had no 
+// issues not using a promise, but hosting services like Cyclic would crash the app each time a collection was 
+// accessed (e.g., check if a user exists) without the promise. 
 Promise.all([
     new Promise(resolve => mongodbStore.on('connected', resolve)),
     new Promise(resolve => sessionStore.on('connected', resolve))
