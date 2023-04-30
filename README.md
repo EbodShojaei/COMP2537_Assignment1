@@ -37,5 +37,5 @@ A simple website using Node.js that connects to an encrypted MongoDB database to
 	- Used for setup
 <br>
 
-- **[ChatGPT 4](https://chat.openai.com/)** by OpenAI
+- **[ChatGPT-4](https://chat.openai.com/)** by OpenAI
 	- Used for debugging
