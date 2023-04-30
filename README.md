@@ -32,7 +32,7 @@ A simple website using Node.js that connects to an encrypted MongoDB database to
 
 
 ## Resources
-- **[COMP2537_Demo_Code_1](https://github.com/greencodecomments/COMP2537_Demo_Code_1)** by greencodecomment
+- **[COMP2537_Demo_Code_1](https://github.com/greencodecomments/COMP2537_Demo_Code_1)** by greencodecomments
 	- Used for setup
 <br>
 
