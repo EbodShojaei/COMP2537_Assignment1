@@ -366,7 +366,20 @@ app.post('/loginSubmit', async (req, res) => {
 
 app.get('/logout', (req, res) => {
     req.session.destroy();
-    res.redirect('/');
+
+    var html = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta http-equiv="refresh" content="3;url=/">
+      </head>
+      <body>
+        <p>Logged out successfully. Redirecting to homepage...</p>
+      </body>
+    </html>
+  `;
+
+  res.send(html);
 });
 
 
