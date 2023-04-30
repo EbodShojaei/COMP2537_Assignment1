@@ -47,20 +47,18 @@ const sessionStore = new MongoDBSession({
 let userCollection;
 let sessionCollection;
 
-mongodbStore.on('connected', function () {
-    console.log('MongoDB user store connected');
-
-    // Enable access to the users collection
+Promise.all([
+    new Promise(resolve => mongodbStore.on('connected', resolve)),
+    new Promise(resolve => sessionStore.on('connected', resolve))
+  ]).then(() => {
+    console.log('MongoDB user store and session store connected');
     userCollection = mongodbStore.client.db().collection('users');
-});
-
-sessionStore.on('connected', function () {
-    console.log('MongoDB session store connected');
-
-    // Enable access to the sessions collection
     sessionCollection = sessionStore.client.db().collection('sessions');
-});
-
+    app.listen(port, () => {
+      console.log("Node application listening on port " + port);
+    });
+  });
+  
 
 app.use(session({
     secret: node_session_secret,
@@ -431,6 +429,6 @@ app.get("*", (req, res) => {
 });
 
 
-app.listen(port, () => {
-    console.log("Node application listening on port " + port);
-});
+// app.listen(port, () => {
+//     console.log("Node application listening on port " + port);
+// });
