@@ -217,9 +217,14 @@ app.post('/signupSubmit', async (req, res) => {
     }
 
     // Parametrized query treats user input as plain data and not code, so as to defend against injection attacks.
-    // $eq looks for an exact match and requires collation for case-insensitive query. Name must be unique.
+    // $eq looks for an exact match and requires collation for case-insensitive query. 
     //
-    //@credit Debugged by ChatGPT-4
+    // The user input values are passed as parameters. They can no longer contain an executable code since the 
+    // parameter is treated as a literal value and checked for the type and length (NOTE: 'name' is being treated 
+    // as a username, so it must be unique).
+    //
+    // @credit Debugged by ChatGPT-4
+    // @see https://www.sqlshack.com/using-parameterized-queries-to-avoid-sql-injection/
     const nameResult = await userCollection.find({ name: { $eq: name } }, { collation: { locale: 'en_US', strength: 2 } }).project({ name: 1, email: 1, password: 1, _id: 1 }).toArray();
 
     const emailResult = await userCollection.find({ email: { $eq: email } }).project({ name: 1, email: 1, password: 1, _id: 1 }).toArray();
